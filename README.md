@@ -1,9 +1,11 @@
 ## MakanSense (team: makan 3.0)
 
 ## Project Description
-MacroSense is an innovative AI-powered macro intelligence platform that redefines how asset managers tackle information overload. Unlike traditional keyword alerts and fragmented monitoring, we've created an intelligent system that thinks, remembers, and predicts.
+MakanSense is a macro intelligence software that reinvents the approach that asset managers use to overcome information overload. Our system is not just any system that misses the capabilities of a traditional key board alert and a piecemeal method of monitoring; but is an intelligent system, one that thinks, then recalls and then projects.
 
-The platform's core innovations include: a dual‑dimension Heat Index that distinguishes between "currently hottest" and "fastest‑warming" themes, helping users identify market focus versus emerging opportunities; a top‑ticker news alert bar that uses red highlighting for 5‑star events, ensuring critical data is never missed; interactive learning charts that transform professional analysis into teaching tools—hover over any indicator for instant technical explanations; and an Institutional Memory module that stores historical cases, automatically surfacing similar past scenarios when new events unfold. Most groundbreaking is the Risk Engine—it doesn't just tell you what happened, but projects what comes next (e.g., higher‑than‑expected inflation → rate hike probability ↑ → rates volatility ↑). Through an intuitive dashboard, MacroSense transforms fragmented information into coherent narratives, empowering asset managers to shift from reactive monitoring to proactive anticipation.
+Dual-dimension Heat Index is use to differentiate between the hottest and the fastest-warming topics so users can divide their focus between the market and where opportunities are emerging. A top-ticker news alert bar that is highlighted in red letters and star ratings to ensure that the users never miss important 5 star events.
+
+We also provide interactive learning charts, as their hovering over any indicator brings instant technical explanation and an Institutional Memory module that stores historical cases that would automatically be brought to the fore once similar patterns emerged. The most innovative one is the Risk Engine.It does not report upon events, but it preempts what will happen next (e.g., inflation surprise - causes rate hike probability - leads to rates volatility. MakanSense will simplify fragmented information by enabling asset managers to transition to proactive anticipation through an intuitive dashboard that links all insights to original articles.
 
 ## Features
 - Live macro theme tracking with heat index scoring
