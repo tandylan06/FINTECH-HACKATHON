@@ -1,0 +1,623 @@
+第一部分：核心功能架构
+【原有核心功能】（保留并优化）
+模块	功能描述
+主题生命周期追踪	实时追踪宏观主题演变，时间轴展示关键节点
+跨区域/跨资产关联发现	知识图谱展示主题在全球不同市场和资产间的传导
+风险推演引擎	因果链可视化：事件→直接影响→传导路径→资产影响
+交互式技术分析学习平台	支撑/压力识别、画图验证、实时教学
+【新增/优化功能1】🔴 顶部新闻预警跑马灯
+核心价值：让用户随时感知即将发布的重要经济数据，无需主动搜索即可获得预警。
+
+功能描述：
+
+在网站顶部添加一个固定跑马灯条，始终可见
+
+按时间顺序展示即将发布的经济数据/新闻事件
+
+视觉分级：
+
+🟥 红色背景：高重要性事件（5星）
+
+🟧 橙色背景：中等重要性事件（3-4星）
+
+🟨 黄色背景：一般重要性事件（1-2星）
+
+重要指数：用★星星表示，最高5颗星
+
+倒计时显示：距离发布时间还有XX分钟
+
+自动滚动：多条新闻轮播显示
+
+界面实现：
+
+jsx
+// 顶部跑马灯组件
+const NewsTicker = () => {
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  
+  useEffect(() => {
+    // 获取未来24小时的经济事件
+    fetch('/api/economic-calendar/upcoming?hours=24')
+      .then(res => res.json())
+      .then(data => setUpcomingEvents(data));
+      
+    // 每分钟更新倒计时
+    const interval = setInterval(() => {
+      setUpcomingEvents(prev => 
+        prev.map(event => ({
+          ...event,
+          timeRemaining: calculateTimeRemaining(event.releaseTime)
+        }))
+      );
+    }, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
+  return (
+    <div className="bg-gray-900 text-white py-2 fixed top-0 left-0 right-0 z-50">
+      <div className="container mx-auto overflow-hidden">
+        <div className="flex animate-marquee whitespace-nowrap">
+          {upcomingEvents.map(event => (
+            <div 
+              key={event.id}
+              className={`inline-flex items-center mx-4 px-3 py-1 rounded-full ${
+                event.importance >= 5 ? 'bg-red-600' :
+                event.importance >= 3 ? 'bg-orange-500' :
+                'bg-yellow-500'
+              }`}
+            >
+              <span className="font-medium">{event.country}</span>
+              <span className="mx-2">|</span>
+              <span>{event.name}</span>
+              <div className="ml-2 flex">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className={i < event.importance ? 'text-yellow-300' : 'text-gray-400'}>
+                    ★
+                  </span>
+                ))}
+              </div>
+              <span className="ml-3 text-sm bg-black/30 px-2 py-0.5 rounded">
+                {event.timeRemaining}分钟后
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+数据格式：
+
+json
+{
+  "id": "evt_001",
+  "name": "美国非农就业数据",
+  "country": "美国",
+  "releaseTime": "2026-03-10T13:30:00Z",
+  "importance": 5,  // 5星最高
+  "previous": "187K",
+  "consensus": "195K",
+  "currency": "USD",
+  "timeRemaining": 45  // 动态计算
+}
+【新增/优化功能2】📊 双维度热度分析面板
+核心价值：将原来单一的热度值拆分为当前最热和升温最快两个维度，帮助用户区分"已经热了很久的主题"和"正在快速升温的主题"。
+
+功能描述：
+
+左侧面板：🔥 当前热度最高
+基于绝对热度值（新闻提及量 + 来源权重 + 情感强度）
+
+展示当前市场上讨论最多的主题
+
+适合了解市场焦点
+
+右侧面板：📈 热度上升最快（环比增长率）
+基于热度变化率（（当前热度 - 昨日热度）/ 昨日热度 × 100%）
+
+展示正在快速升温的主题
+
+适合发现潜在机会/风险
+
+界面实现：
+
+jsx
+// 双维度热度面板
+const HeatAnalysisPanel = () => {
+  const [topByHeat, setTopByHeat] = useState([]);
+  const [topByGrowth, setTopByGrowth] = useState([]);
+  
+  useEffect(() => {
+    fetch('/api/topics/heat-analysis')
+      .then(res => res.json())
+      .then(data => {
+        setTopByHeat(data.topByHeat);
+        setTopByGrowth(data.topByGrowth);
+      });
+  }, []);
+  
+  return (
+    <div className="grid grid-cols-2 gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+      {/* 左侧：当前热度最高 */}
+      <div>
+        <h3 className="font-bold text-lg mb-3 flex items-center">
+          <FireIcon className="h-5 w-5 text-red-500 mr-2" />
+          当前热度最高
+        </h3>
+        <div className="space-y-3">
+          {topByHeat.map(topic => (
+            <div key={topic.id} className="flex items-center">
+              <div className="flex-1">
+                <div className="font-medium">{topic.name}</div>
+                <div className="text-sm text-gray-500">{topic.region}</div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-lg">{topic.heat}</div>
+                <div className="text-xs text-gray-500">热度值</div>
+              </div>
+              <div className="w-20 ml-2">
+                <div className="h-2 bg-gray-200 rounded">
+                  <div 
+                    className="h-2 bg-red-500 rounded" 
+                    style={{ width: `${topic.heat}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      {/* 右侧：热度上升最快 */}
+      <div>
+        <h3 className="font-bold text-lg mb-3 flex items-center">
+          <TrendingUpIcon className="h-5 w-5 text-green-500 mr-2" />
+          热度上升最快
+        </h3>
+        <div className="space-y-3">
+          {topByGrowth.map(topic => (
+            <div key={topic.id} className="flex items-center">
+              <div className="flex-1">
+                <div className="font-medium">{topic.name}</div>
+                <div className="text-sm text-gray-500">{topic.region}</div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-lg text-green-600">
+                  +{topic.growthRate}%
+                </div>
+                <div className="text-xs text-gray-500">环比增长</div>
+              </div>
+              <div className="w-20 ml-2">
+                <div className="h-2 bg-gray-200 rounded">
+                  <div 
+                    className="h-2 bg-green-500 rounded" 
+                    style={{ width: `${topic.growthRate}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+数据格式：
+
+json
+{
+  "topByHeat": [
+    {"id": "us-inflation", "name": "美国通胀", "region": "美国", "heat": 87},
+    {"id": "fed-policy", "name": "美联储政策", "region": "美国", "heat": 82},
+    {"id": "middle-east", "name": "中东局势", "region": "中东", "heat": 78}
+  ],
+  "topByGrowth": [
+    {"id": "japan-ycc", "name": "日本YCC政策", "region": "日本", "growthRate": 45},
+    {"id": "oil-price", "name": "油价波动", "region": "全球", "growthRate": 38},
+    {"id": "tech-earnings", "name": "科技股财报", "region": "美国", "growthRate": 32}
+  ]
+}
+【新增/优化功能3】🏛️ 机构记忆案例扩充
+核心价值：通过更多真实历史案例，增强"机构记忆"功能的实用性和可信度，帮助用户从历史中学习。
+
+扩充案例要求：
+
+至少10个真实历史事件案例
+
+覆盖不同年份（2022-2026年）
+
+每个案例包含：事件描述、当时市场反应、后续发展、经验教训
+
+案例数据格式：
+
+json
+// data/historical-cases.json
+[
+  {
+    "id": "case-001",
+    "title": "2022年英国养老金危机",
+    "date": "2022-09-23",
+    "summary": "英国政府迷你预算案引发国债收益率飙升，养老金面临保证金追缴",
+    "trigger_event": "财政大臣夸滕宣布450亿英镑减税计划",
+    "market_impact": {
+      "gilt_yields": "+100bps",
+      "gbp_usd": "-3.5%",
+      "ftse_250": "-5%"
+    },
+    "key_lessons": [
+      "杠杆化投资策略在波动率上升时可能引发连锁反应",
+      "央行政策转向可能暴露市场结构性脆弱性"
+    ],
+    "similar_situations": ["当前英国债务水平类似"],
+    "tags": ["债券市场", "养老金", "英国", "2022"]
+  },
+  {
+    "id": "case-002",
+    "title": "2023年硅谷银行倒闭事件",
+    "date": "2023-03-10",
+    "summary": "利率上升导致债券投资组合亏损，储户挤兑引发银行倒闭",
+    "trigger_event": "SVB宣布出售债券亏损18亿美元，启动融资",
+    "market_impact": {
+      "kbw_bank_index": "-15%",
+      "federal_futures": "-50bps",
+      "credit_spreads": "+30bps"
+    },
+    "key_lessons": [
+      "利率快速上升对持有长期债券的机构构成风险",
+      "社交媒体时代挤兑速度远超传统模型"
+    ],
+    "similar_situations": ["当前区域银行商业地产风险"],
+    "tags": ["银行业", "利率风险", "美国", "2023"]
+  },
+  {
+    "id": "case-003",
+    "title": "2024年日本央行结束负利率",
+    "date": "2024-03-19",
+    "summary": "日本央行17年来首次加息，结束负利率政策",
+    "trigger_event": "日本央行将政策利率从-0.1%上调至0-0.1%",
+    "market_impact": {
+      "usd_jpy": "-2%",
+      "nikkei": "-0.5%",
+      "jgb_yields": "+5bps"
+    },
+    "key_lessons": [
+      "日元套利交易平仓引发全球波动",
+      "央行政策转折点往往提前被市场消化"
+    ],
+    "similar_situations": ["下一次加息预期"],
+    "tags": ["央行政策", "日元", "日本", "2024"]
+  },
+  {
+    "id": "case-004",
+    "title": "2025年DeepSeek冲击科技股",
+    "date": "2025-01-27",
+    "summary": "中国AI初创公司DeepSeek发布低成本模型，引发科技股估值重估",
+    "trigger_event": "DeepSeek R1模型发布，训练成本仅为GPT-4的1/10",
+    "market_impact": {
+      "nvda": "-17%",
+      "nasdaq": "-3%",
+      "semiconductor_index": "-5%"
+    },
+    "key_lessons": [
+      "技术创新可能颠覆行业竞争格局",
+      "高估值股票对竞争威胁敏感"
+    ],
+    "similar_situations": ["其他AI公司技术突破"],
+    "tags": ["科技股", "AI", "中国", "2025"]
+  }
+  // ... 更多案例到2026年
+]
+界面展示：
+
+jsx
+// 机构记忆面板
+const InstitutionalMemory = ({ currentTopic }) => {
+  const [similarCases, setSimilarCases] = useState([]);
+  
+  useEffect(() => {
+    // 获取与当前主题相似的历史案例
+    fetch(`/api/historical/similar/${currentTopic}`)
+      .then(res => res.json())
+      .then(setSimilarCases);
+  }, [currentTopic]);
+  
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <h3 className="font-bold text-lg mb-3 flex items-center">
+        <LibraryIcon className="h-5 w-5 mr-2" />
+        机构记忆 - 相似历史案例
+      </h3>
+      
+      <div className="space-y-4">
+        {similarCases.map(case_ => (
+          <div key={case_.id} className="border-l-4 border-blue-500 pl-4">
+            <div className="flex justify-between">
+              <h4 className="font-medium">{case_.title}</h4>
+              <span className="text-sm text-gray-500">{case_.date}</span>
+            </div>
+            <p className="text-sm mt-1">{case_.summary}</p>
+            
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {Object.entries(case_.market_impact).map(([key, value]) => (
+                <div key={key} className="text-xs">
+                  <span className="text-gray-500">{key}:</span>
+                  <span className={`ml-1 ${
+                    value.startsWith('+') ? 'text-green-600' : 
+                    value.startsWith('-') ? 'text-red-600' : ''
+                  }`}>{value}</span>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-2">
+              <p className="text-xs font-medium">📌 经验教训：</p>
+              <ul className="text-xs list-disc pl-4 mt-1">
+                {case_.key_lessons.map((lesson, i) => (
+                  <li key={i}>{lesson}</li>
+                ))}
+              </ul>
+            </div>
+            
+            {case_.similar_situations.length > 0 && (
+              <div className="mt-2 text-xs bg-yellow-50 p-2 rounded">
+                ⚠️ 当前相似点：{case_.similar_situations.join('、')}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+【新增/优化功能4】📐 界面布局优化
+调整内容：
+
+Market Analysis 2.0 → 改为 Market Analysis（去掉2.0）
+
+Scenario Simulator 右侧空白区域填充以下内容：
+
+jsx
+// Scenario Simulator 右侧面板
+const ScenarioSidePanel = () => {
+  return (
+    <div className="space-y-4">
+      {/* 实时市场情绪 */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h4 className="font-medium mb-2">📊 实时市场情绪</h4>
+        <div className="space-y-2">
+          <div>
+            <div className="flex justify-between text-sm">
+              <span>股票</span>
+              <span className="text-green-600">看涨 65%</span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded">
+              <div className="h-2 bg-green-500 rounded" style={{width: '65%'}} />
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between text-sm">
+              <span>债券</span>
+              <span className="text-red-600">看跌 58%</span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded">
+              <div className="h-2 bg-red-500 rounded" style={{width: '58%'}} />
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between text-sm">
+              <span>外汇</span>
+              <span className="text-yellow-600">中性 52%</span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded">
+              <div className="h-2 bg-yellow-500 rounded" style={{width: '52%'}} />
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between text-sm">
+              <span>商品</span>
+              <span className="text-green-600">看涨 71%</span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded">
+              <div className="h-2 bg-green-500 rounded" style={{width: '71%'}} />
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* 热门搜索/关注 */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h4 className="font-medium mb-2">🔥 用户热搜</h4>
+        <div className="flex flex-wrap gap-2">
+          <span className="px-2 py-1 bg-gray-100 rounded text-sm">EUR/USD</span>
+          <span className="px-2 py-1 bg-gray-100 rounded text-sm">美联储</span>
+          <span className="px-2 py-1 bg-gray-100 rounded text-sm">非农</span>
+          <span className="px-2 py-1 bg-gray-100 rounded text-sm">比特币</span>
+          <span className="px-2 py-1 bg-gray-100 rounded text-sm">油价</span>
+          <span className="px-2 py-1 bg-gray-100 rounded text-sm">英伟达</span>
+        </div>
+      </div>
+      
+      {/* 今日重要数据 */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h4 className="font-medium mb-2">📅 今日重要数据</h4>
+        <div className="space-y-2">
+          <div className="text-sm flex justify-between">
+            <span>🇺🇸 CPI (20:30)</span>
+            <span className="bg-red-100 text-red-800 px-2 rounded text-xs">高</span>
+          </div>
+          <div className="text-sm flex justify-between">
+            <span>🇪🇺 欧央行讲话 (21:00)</span>
+            <span className="bg-orange-100 text-orange-800 px-2 rounded text-xs">中</span>
+          </div>
+          <div className="text-sm flex justify-between">
+            <span>🇨🇳 贸易帐 (10:00)</span>
+            <span className="bg-yellow-100 text-yellow-800 px-2 rounded text-xs">低</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+🔧 第二部分：技术架构与API
+新增API端点
+python
+# 新增API
+@app.get("/api/economic-calendar/upcoming")
+async def get_upcoming_events(hours: int = 24):
+    """获取未来指定小时内的经济事件"""
+    # 从日历API获取数据
+    events = load_economic_calendar()
+    
+    # 过滤未来hours小时内的事件
+    now = datetime.utcnow()
+    cutoff = now + timedelta(hours=hours)
+    
+    upcoming = [
+        e for e in events 
+        if now <= datetime.fromisoftime(e["releaseTime"]) <= cutoff
+    ]
+    
+    # 按时间排序
+    upcoming.sort(key=lambda x: x["releaseTime"])
+    
+    # 计算剩余时间
+    for e in upcoming:
+        release = datetime.fromisoftime(e["releaseTime"])
+        e["timeRemaining"] = int((release - now).total_seconds() / 60)
+    
+    return upcoming
+
+@app.get("/api/topics/heat-analysis")
+async def get_heat_analysis():
+    """获取双维度热度分析数据"""
+    # 加载主题数据
+    topics = load_topics()
+    
+    # 计算当前热度（绝对）
+    top_by_heat = sorted(
+        topics, 
+        key=lambda x: x["heat"], 
+        reverse=True
+    )[:5]
+    
+    # 计算热度增长率（环比）
+    for topic in topics:
+        # 假设有历史热度数据
+        history = topic.get("heat_history", [])
+        if len(history) >= 2:
+            current = history[-1]["heat"]
+            previous = history[-2]["heat"]
+            if previous > 0:
+                topic["growthRate"] = round((current - previous) / previous * 100)
+            else:
+                topic["growthRate"] = 0
+        else:
+            topic["growthRate"] = 0
+    
+    top_by_growth = sorted(
+        [t for t in topics if t["growthRate"] > 0],
+        key=lambda x: x["growthRate"],
+        reverse=True
+    )[:5]
+    
+    return {
+        "topByHeat": top_by_heat,
+        "topByGrowth": top_by_growth
+    }
+
+@app.get("/api/historical/similar/{topic_id}")
+async def get_similar_historical(topic_id: str, limit: int = 3):
+    """获取与当前主题相似的历史案例"""
+    # 加载所有历史案例
+    cases = load_historical_cases()
+    
+    # 基于标签和关键词匹配相似度
+    current_topic = get_topic(topic_id)
+    
+    similar = []
+    for case in cases:
+        # 计算相似度（简化版）
+        similarity = calculate_similarity(current_topic, case)
+        if similarity > 0.3:  # 阈值
+            similar.append({
+                **case,
+                "similarity": round(similarity * 100)
+            })
+    
+    # 按相似度排序
+    similar.sort(key=lambda x: x["similarity"], reverse=True)
+    
+    return similar[:limit]
+🎨 第三部分：完整页面布局
+主页面布局（带顶部跑马灯）
+jsx
+// pages/dashboard.jsx
+export default function Dashboard() {
+  return (
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      {/* 顶部固定跑马灯 */}
+      <NewsTicker />
+      
+      {/* 主内容区（顶部留出跑马灯高度） */}
+      <div className="pt-16">
+        <div className="container mx-auto p-4">
+          {/* 双维度热度分析面板 */}
+          <HeatAnalysisPanel />
+          
+          {/* 主内容网格 */}
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            {/* 左侧：主题追踪 */}
+            <div className="col-span-2">
+              <TopicTimeline />
+            </div>
+            
+            {/* 右侧：机构记忆 */}
+            <div>
+              <InstitutionalMemory currentTopic="us-inflation" />
+            </div>
+          </div>
+          
+          {/* 底部：市场分析 + 场景模拟器 */}
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            {/* Market Analysis（已去掉2.0） */}
+            <div className="col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+              <h3 className="font-bold text-lg mb-3">Market Analysis</h3>
+              {/* 原有市场分析内容 */}
+            </div>
+            
+            {/* Scenario Simulator 右侧面板 */}
+            <div className="col-span-1">
+              <ScenarioSidePanel />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+✅ 第四部分：评分标准对应
+评分维度	得分点	实现方式
+创新性 (20%)	顶部预警跑马灯、双维度热度分析、10+历史案例	视觉分级设计、环比增长率计算、案例库建设
+技术 (20%)	实时数据更新、相似度算法、日历集成	API轮询、向量相似度计算、外部日历API
+用户体验 (20%)	全局预警可见、双维度对比、历史学习	固定顶部跑马灯、左右对比设计、案例教学
+可行性 (20%)	轻量级实现、可扩展案例库	JSON数据 + 简单算法
+市场潜力 (20%)	专业投研工具 + 教育价值	机构记忆功能、历史案例学习
+📝 第五部分：数据准备清单
+text
+📁 /data
+├── 📄 economic-calendar.json      # 经济日历数据（含重要性星级）
+├── 📄 topics-heat.json             # 主题热度数据（含历史趋势）
+├── 📄 historical-cases.json        # 10+历史案例（2022-2026）
+├── 📄 market-sentiment.json        # 实时市场情绪数据
+└── 📄 trending-searches.json       # 用户热搜数据
+🎯 总结：本次优化亮点
+顶部预警跑马灯：让重要数据发布始终可见，红色高亮5星事件
+
+双维度热度分析：区分"当前最热"和"升温最快"，帮助发现潜在机会
+
+机构记忆扩充：10+真实案例，覆盖2022-2026年，增强历史学习价值
+
+界面优化：Market Analysis去掉2.0，右侧面板填充实时情绪和热搜
+
+视觉分级：用星星数量表示重要性，颜色区分紧急程度

@@ -1,0 +1,705 @@
+整合版提示词：MacroSense 2.0 - 宏观主题追踪与交易学习平台
+项目概述
+开发一个面向资产管理人员和交易者的AI驱动的宏观主题情报与交易学习平台，名为"MacroSense 2.0"。该平台在原有主题追踪和风险推演功能基础上，新增三大核心模块：数据发布前预警系统、交互式技术分析学习平台、实时新闻更新引擎，打造B端专业工具+C端教育变现的混合模式。
+
+📊 第一部分：核心功能架构
+【原有核心功能】（保留）
+模块	功能描述
+主题生命周期追踪	实时追踪宏观主题演变，时间轴展示关键节点
+热度识别引擎	动态识别主题"升温/降温"，热度云图可视化
+跨区域/跨资产关联发现	知识图谱展示主题在全球不同市场和资产间的传导
+机构记忆维护	历史讨论沉淀，新事件自动检索相似历史情景
+风险推演引擎	因果链可视化：事件→直接影响→传导路径→资产影响
+【新增功能1】⏰ 数据发布前预警系统
+核心价值：在重大经济数据发布前15-30分钟，主动提醒用户谨慎交易，降低数据冲击带来的风险。
+
+功能描述：
+
+集成宏观经济日历，涵盖各国CPI、非农就业、GDP、利率决议等关键数据
+
+数据发布前智能提醒：用户搜索任何金融产品时，系统自动检查15-30分钟内是否有高影响度数据发布
+
+分级预警：根据数据重要性（HIGH/MEDIUM/LOW）和与用户搜索产品的相关性，展示不同级别的提示
+
+风险建议：提供数据发布前后的交易建议（如"建议等待数据落地"、"预期波动加剧，可考虑降低仓位"）
+
+界面实现：
+
+jsx
+// 搜索框预警组件
+<SearchBox onSearch={(query) => {
+  const upcomingEvent = checkUpcomingEvents(15); // 检查15分钟内
+  if (upcomingEvent && upcomingEvent.volatility === 'HIGH') {
+    showWarningModal({
+      title: `⚠️ ${upcomingEvent.event} 即将发布`,
+      timeLeft: '15分钟',
+      impact: '高波动性预期',
+      recommendations: [
+        '建议等待数据发布后再做决策',
+        '如已持仓，可考虑设置止损',
+        '数据发布后前5分钟波动最大'
+      ]
+    });
+  }
+}} />
+数据来源：通过宏观经济日历API获取实时事件数据，包含以下字段：
+
+事件名称、国家、货币
+
+发布时间（UTC）
+
+实际值、预期值、前值
+
+波动性评级（HIGH/MEDIUM/LOW）
+
+是否优于预期
+
+【新增功能2】🎓 交互式技术分析学习平台
+核心价值：从"直接给策略"转向"教用户自己分析"，通过付费会员模式实现商业变现。
+
+功能描述：
+
+2.1 免费层：基础图表分析
+
+提供主要交易品种（外汇/股票/加密货币）的K线图
+
+鼠标悬停时显示基础价格信息
+
+2.2 付费会员层：专业教学功能
+
+交互式图表标注：用户可点击图表上的任意位置，系统自动识别并标注：
+
+支撑位：基于历史低点、成交量分布、均线支撑
+
+压力位：基于历史高点、筹码分布、均线压力
+
+多空分水岭：基于昨日收盘价、关键均线、枢轴点
+
+趋势线：自动识别并绘制上升/下降趋势线
+
+教学解释引擎：每个标注点都附带详细的技术分析教学
+
+text
+"当前价格在1.0850形成支撑，原因是：
+1. 这是3月15日的低点（双底形态）
+2. 200日均线在此位置
+3. RSI显示超卖区域反弹
+💡 知识点：当多个技术指标在同一位置形成共振，支撑/压力有效性更高"
+画图工具包：允许用户自己画趋势线、通道、斐波那契，系统实时验证并提供反馈
+
+text
+"您画的上升趋势线连接了三个低点，斜率约15度，目前第三次测试支撑有效。
+💡 提示：趋势线被测试的次数越多，有效性越强"
+情景模拟：基于当前图表形态，推演可能的市场情景
+
+text
+"当前形成头肩底形态，若突破颈线1.0950，理论目标位1.1150
+风险提示：如跌破1.0850支撑，形态失效"
+商业模式：
+
+基础功能：免费（吸引用户）
+
+高级教学功能：月费会员
+
+企业培训包：定制课程+团队管理功能
+
+【新增功能3】📰 实时新闻更新引擎
+核心价值：提供最新市场资讯（覆盖2025-2026年），保持平台内容新鲜度和时效性。
+
+功能描述：
+
+3.1 多源新闻聚合
+
+集成金融新闻API，获取实时股票新闻、价格和元数据
+
+覆盖主要资产类别：美股、加密货币、外汇、宏观经济
+
+新闻自动关联到平台已有主题，更新主题热度
+
+3.2 新闻时间线
+
+每个主题详情页增加"实时新闻"标签页
+
+按时间倒序排列相关新闻
+
+每条新闻标注来源、发布时间、关联主题
+
+3.3 智能新闻推送
+
+根据用户关注的品种/主题，推送相关新闻
+
+重大新闻弹窗提醒（如利率决议、非农数据）
+
+数据覆盖要求：
+
+时间范围：2023-2026年（最新数据到2026年）
+
+数据量：至少500+条新闻事件
+
+更新频率：模拟实时更新（每30秒新增一条）
+
+数据来源方案：
+
+数据类型	推荐API	特点
+宏观经济日历	Economic Calendar API 	实时经济事件，波动性评级
+股票新闻	Yahoo Finance News API 	实时股票新闻，无需API key
+综合金融数据	Financial Modeling Prep 	免费层，覆盖股票、经济指标
+实时行情	Twelve Data 	免费层800次/天，多资产覆盖
+🔧 第二部分：技术架构与实现
+整体架构图
+text
+┌─────────────────────────────────────────────────────────────┐
+│                        前端展示层                             │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────┐    │
+│  │ 仪表盘概览  │ │ 主题详情页  │ │ 技术分析学习平台    │    │
+│  └─────────────┘ └─────────────┘ └─────────────────────┘    │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────┐    │
+│  │ 预警弹窗    │ │ 新闻时间线  │ │ 交互式图表         │    │
+│  └─────────────┘ └─────────────┘ └─────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                        API服务层                             │
+│  ┌─────────────────┐ ┌─────────────────┐                   │
+│  │ 主题追踪API     │ │ 风险推演API     │                   │
+│  └─────────────────┘ └─────────────────┘                   │
+│  ┌─────────────────┐ ┌─────────────────┐                   │
+│  │ 预警检查API     │ │ 技术分析API     │                   │
+│  └─────────────────┘ └─────────────────┘                   │
+│  ┌─────────────────┐ ┌─────────────────┐                   │
+│  │ 新闻聚合API     │ │ 用户管理API     │                   │
+│  └─────────────────┘ └─────────────────┘                   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                       数据层                                 │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────┐    │
+│  │ JSON数据文件│ │ 内存数据库  │ │ 外部API集成         │    │
+│  │ (预置数据)  │ │ (运行时)    │ │ (新闻/日历/行情)    │    │
+│  └─────────────┘ └─────────────┘ └─────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+核心API设计
+python
+# main.py - FastAPI后端示例
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+import json
+import httpx
+from datetime import datetime, timedelta
+from typing import Optional
+
+app = FastAPI(title="MacroSense 2.0 API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+)
+
+# ============= 新增功能1：数据发布预警 =============
+@app.get("/api/alerts/upcoming-events")
+async def get_upcoming_events(minutes: int = 30):
+    """获取指定时间内即将发布的经济事件"""
+    # 从宏观经济日历API获取数据 [citation:1]
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            "https://api.example.com/economic-calendar",
+            params={
+                "from": datetime.utcnow().isoformat(),
+                "to": (datetime.utcnow() + timedelta(minutes=minutes)).isoformat(),
+                "volatility": "HIGH,MEDIUM"
+            }
+        )
+        return response.json()
+
+@app.get("/api/alerts/check/{symbol}")
+async def check_symbol_alert(symbol: str):
+    """检查用户搜索的品种是否有即将发布的相关数据"""
+    # 获取15分钟内的事件
+    events = await get_upcoming_events(15)
+    
+    # 判断事件是否与搜索品种相关
+    relevant_events = []
+    for event in events:
+        if is_relevant(symbol, event):  # 自定义关联逻辑
+            relevant_events.append({
+                "event": event["name"],
+                "time": event["dateUtc"],
+                "volatility": event["volatility"],
+                "country": event["countryCode"],
+                "consensus": event.get("consensus"),
+                "previous": event.get("previous"),
+                "recommendations": generate_recommendations(event, symbol)
+            })
+    
+    return {"alerts": relevant_events}
+
+# ============= 新增功能2：技术分析学习 =============
+@app.get("/api/technical/annotate/{symbol}")
+async def annotate_chart(symbol: str, timeframe: str = "1d"):
+    """获取图表技术分析标注（支撑/压力/趋势线）"""
+    # 获取历史K线数据 [citation:6]
+    ohlcv_data = await get_ohlcv(symbol, timeframe)
+    
+    # 计算技术指标
+    annotations = {
+        "support_levels": calculate_support(ohlcv_data),
+        "resistance_levels": calculate_resistance(ohlcv_data),
+        "trend_lines": detect_trend_lines(ohlcv_data),
+        "moving_averages": {
+            "ma20": calculate_ma(ohlcv_data, 20),
+            "ma50": calculate_ma(ohlcv_data, 50),
+            "ma200": calculate_ma(ohlcv_data, 200)
+        },
+        "pivot_points": calculate_pivot(ohlcv_data),
+        "educational_notes": generate_educational_notes(ohlcv_data)  # 教学解释
+    }
+    
+    return annotations
+
+@app.post("/api/technical/validate-drawing")
+async def validate_user_drawing(drawing: dict):
+    """验证用户自己画的趋势线/通道是否有效"""
+    # 分析用户画的线是否符合技术分析原则
+    validation = {
+        "is_valid": check_drawing_validity(drawing),
+        "touches": count_touches(drawing),  # 被价格测试的次数
+        "suggestions": provide_suggestions(drawing),  # 改进建议
+        "lesson": generate_lesson(drawing)  # 相关知识点
+    }
+    return validation
+
+# ============= 新增功能3：实时新闻 =============
+@app.get("/api/news/latest")
+async def get_latest_news(limit: int = 50, topics: Optional[str] = None):
+    """获取最新新闻"""
+    # 从新闻API获取数据 [citation:2][citation:9]
+    async with httpx.AsyncClient() as client:
+        params = {"limit": limit}
+        if topics:
+            params["topics"] = topics
+            
+        response = await client.get(
+            "https://api.example.com/financial-news",
+            params=params
+        )
+        news = response.json()
+    
+    # 关联到平台主题
+    for item in news:
+        item["related_topics"] = await find_related_topics(item["title"])
+    
+    return news
+
+@app.get("/api/news/topic/{topic_id}")
+async def get_topic_news(topic_id: str, limit: int = 50):
+    """获取特定主题的相关新闻"""
+    # 返回与该主题相关的新闻时间线
+    news = await get_latest_news(limit)
+    # 过滤出与该主题相关的新闻
+    filtered = [n for n in news if topic_id in n.get("related_topics", [])]
+    return filtered
+
+# ============= 原有功能API保留 =============
+@app.get("/api/dashboard/overview")
+async def get_dashboard_overview():
+    """仪表盘概览（原有）"""
+    with open("data/dashboard.json", "r") as f:
+        return json.load(f)
+
+@app.get("/api/topics/{topic_id}")
+async def get_topic_detail(topic_id: str):
+    """主题详情（原有）"""
+    with open(f"data/topics/{topic_id}.json", "r") as f:
+        return json.load(f)
+📁 第三部分：数据准备要求
+数据文件结构
+text
+📁 /data
+├── 📄 dashboard.json              # 仪表盘数据（原有）
+├── 📁 /topics                      # 主题数据（原有）
+│   ├── us-inflation.json
+│   ├── fed-policy.json
+│   └── ...
+├── 📁 /news                        # 新增：新闻数据
+│   ├── 2025-01.json
+│   ├── 2025-02.json
+│   ├── ...
+│   └── 2026-03.json                # 最新数据到2026年
+├── 📁 /economic-calendar           # 新增：经济日历
+│   ├── 2025-calendar.json
+│   └── 2026-calendar.json
+├── 📁 /market-data                  # 新增：行情数据
+│   ├── forex.json
+│   ├── stocks.json
+│   └── crypto.json
+└── 📄 /users                        # 新增：用户数据
+    ├── free-users.json
+    └── premium-users.json
+新闻数据样例（2025-2026）
+json
+// data/news/2026-03.json
+[
+  {
+    "id": "news-202603-001",
+    "title": "美联储3月维持利率不变，点阵图显示年内降息两次",
+    "date": "2026-03-19T18:00:00Z",
+    "source": "Reuters",
+    "url": "https://reuters.com/...",
+    "summary": "美联储FOMC声明：联邦基金利率目标区间维持在4.25%-4.50%不变。点阵图显示2026年底利率中值为3.75%，暗示年内两次降息。",
+    "topics": ["fed-policy", "us-interest-rates", "monetary-policy"],
+    "sentiment": "neutral",
+    "impact": {
+      "usd_index": "-0.4%",
+      "snp500": "+0.8%",
+      "gold": "+1.2%"
+    }
+  },
+  {
+    "id": "news-202603-002",
+    "title": "美国2月CPI同比上涨2.8%，核心CPI 3.1%略高于预期",
+    "date": "2026-03-12T13:30:00Z",
+    "source": "Bloomberg",
+    "summary": "美国劳工部数据显示，2月未季调CPI同比上涨2.8%，预期2.7%；核心CPI同比上涨3.1%，预期3.0%。通胀回落速度慢于预期。",
+    "topics": ["us-inflation", "fed-policy", "cpi"],
+    "sentiment": "negative",
+    "impact": {
+      "treasury_yields": "+8bps",
+      "rate_hike_probability": "+15%",
+      "dollar_index": "+0.5%"
+    }
+  },
+  {
+    "id": "news-202603-003",
+    "title": "欧央行宣布降息25个基点，为2025年以来第四次降息",
+    "date": "2026-03-05T12:45:00Z",
+    "source": "FT",
+    "summary": "欧洲央行将存款机制利率从2.5%下调至2.25%，符合市场预期。拉加德表示欧元区经济复苏仍需政策支持。",
+    "topics": ["ecb-policy", "eurozone-economy", "global-rates"],
+    "sentiment": "positive",
+    "impact": {
+      "eur_usd": "-0.3%",
+      "euro_stoxx": "+0.6%",
+      "bund_yields": "-5bps"
+    }
+  }
+]
+经济日历数据样例（2026年3月）
+json
+// data/economic-calendar/2026-03.json
+[
+  {
+    "id": "ec-20260301",
+    "date": "2026-03-06T13:30:00Z",
+    "country": "US",
+    "event": "非农就业人数",
+    "period": "2月",
+    "volatility": "HIGH",
+    "consensus": "185K",
+    "previous": "187K",
+    "unit": "千人",
+    "currency": "USD"
+  },
+  {
+    "id": "ec-20260302",
+    "date": "2026-03-12T13:30:00Z",
+    "country": "US",
+    "event": "CPI年率",
+    "period": "2月",
+    "volatility": "HIGH",
+    "consensus": "2.7%",
+    "previous": "2.9%",
+    "unit": "percent",
+    "currency": "USD"
+  },
+  {
+    "id": "ec-20260303",
+    "date": "2026-03-19T18:00:00Z",
+    "country": "US",
+    "event": "美联储利率决议",
+    "period": "3月",
+    "volatility": "HIGH",
+    "consensus": "4.25-4.50%",
+    "previous": "4.25-4.50%",
+    "unit": "percent",
+    "currency": "USD"
+  },
+  {
+    "id": "ec-20260304",
+    "date": "2026-03-05T12:45:00Z",
+    "country": "EU",
+    "event": "欧洲央行利率决议",
+    "period": "3月",
+    "volatility": "HIGH",
+    "consensus": "2.25%",
+    "previous": "2.50%",
+    "unit": "percent",
+    "currency": "EUR"
+  }
+]
+技术分析数据样例
+json
+// data/market-data/eurusd-2026.json
+{
+  "symbol": "EUR/USD",
+  "timeframe": "1d",
+  "data": [
+    {
+      "date": "2026-03-01",
+      "open": 1.0845,
+      "high": 1.0872,
+      "low": 1.0831,
+      "close": 1.0860,
+      "volume": 125000
+    },
+    {
+      "date": "2026-03-02",
+      "open": 1.0860,
+      "high": 1.0895,
+      "low": 1.0852,
+      "close": 1.0885,
+      "volume": 132000
+    },
+    // ... 更多数据
+  ],
+  "technical_indicators": {
+    "support_levels": [1.0800, 1.0750, 1.0680],
+    "resistance_levels": [1.0950, 1.1020, 1.1150],
+    "ma20": 1.0835,
+    "ma50": 1.0752,
+    "ma200": 1.0520,
+    "pivot": {
+      "pp": 1.0865,
+      "r1": 1.0898,
+      "r2": 1.0931,
+      "s1": 1.0832,
+      "s2": 1.0799
+    }
+  },
+  "educational_notes": [
+    {
+      "level": 1.0800,
+      "note": "这是过去3个月形成的关键支撑区，多次测试有效。当价格接近此区域时，可关注反弹机会。"
+    },
+    {
+      "level": 1.0950,
+      "note": "这是2026年高点形成的阻力位，同时也是200日均线位置。突破此位置意味着上升趋势延续。"
+    }
+  ]
+}
+🎨 第四部分：新增UI组件设计
+1. 数据预警弹窗组件
+jsx
+// components/DataAlertModal.jsx
+const DataAlertModal = ({ event, onClose }) => {
+  return (
+    <div className="fixed top-20 right-8 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-l-4 border-yellow-500 p-4 z-50">
+      <div className="flex justify-between items-start">
+        <div className="flex items-center">
+          <ClockIcon className="h-5 w-5 text-yellow-500 mr-2" />
+          <h3 className="font-bold text-lg">数据即将发布</h3>
+        </div>
+        <button onClick={onClose}>×</button>
+      </div>
+      
+      <div className="mt-3">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded">
+          <p className="font-semibold">{event.event}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {event.country} · {new Date(event.time).toLocaleTimeString()}
+          </p>
+          <p className="text-sm mt-1">
+            <span className="font-medium">预期：</span>{event.consensus} |
+            <span className="font-medium ml-2">前值：</span>{event.previous}
+          </p>
+          <div className="mt-2 flex items-center">
+            <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+              高影响度
+            </span>
+            <span className="text-xs ml-2">距发布还有 15 分钟</span>
+          </div>
+        </div>
+        
+        <div className="mt-3">
+          <h4 className="font-medium text-sm mb-2">📋 交易提示</h4>
+          <ul className="text-sm space-y-1 list-disc pl-5">
+            {event.recommendations.map((rec, i) => (
+              <li key={i}>{rec}</li>
+            ))}
+          </ul>
+        </div>
+        
+        <div className="mt-3 text-xs text-gray-500">
+          *数据发布前后5分钟市场波动可能加剧
+        </div>
+      </div>
+    </div>
+  );
+};
+2. 交互式图表学习组件
+jsx
+// components/LearningChart.jsx
+import { ChartComponent } from 'lightweight-charts-react';
+
+const LearningChart = ({ symbol, isPremium }) => {
+  const [annotations, setAnnotations] = useState([]);
+  const [userDrawing, setUserDrawing] = useState(null);
+  const [feedback, setFeedback] = useState(null);
+  
+  // 获取技术分析标注
+  useEffect(() => {
+    if (isPremium) {
+      fetch(`/api/technical/annotate/${symbol}`)
+        .then(res => res.json())
+        .then(data => setAnnotations(data));
+    }
+  }, [symbol, isPremium]);
+  
+  // 处理用户画图
+  const handleDrawingComplete = async (drawing) => {
+    if (!isPremium) {
+      alert('请升级会员使用画图功能');
+      return;
+    }
+    
+    // 验证用户画的线
+    const res = await fetch('/api/technical/validate-drawing', {
+      method: 'POST',
+      body: JSON.stringify(drawing)
+    });
+    const validation = await res.json();
+    setFeedback(validation);
+  };
+  
+  return (
+    <div className="relative">
+      <ChartComponent
+        data={priceData}
+        annotations={isPremium ? annotations : []}
+        onDrawingComplete={handleDrawingComplete}
+        drawingEnabled={isPremium}
+      />
+      
+      {!isPremium && (
+        <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
+          <button className="bg-blue-600 text-white px-4 py-2 rounded">
+            升级会员解锁技术分析功能
+          </button>
+        </div>
+      )}
+      
+      {feedback && (
+        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
+          <h4 className="font-medium mb-2">📚 学习反馈</h4>
+          <p className="text-sm">{feedback.lesson}</p>
+          {feedback.suggestions && (
+            <p className="text-sm mt-2 text-gray-600">
+              建议：{feedback.suggestions}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+3. 新闻时间线组件
+jsx
+// components/NewsTimeline.jsx
+const NewsTimeline = ({ topicId }) => {
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchNews = async () => {
+      setLoading(true);
+      const url = topicId 
+        ? `/api/news/topic/${topicId}`
+        : '/api/news/latest';
+      
+      const res = await fetch(url);
+      const data = await res.json();
+      setNews(data);
+      setLoading(false);
+    };
+    
+    fetchNews();
+    
+    // 模拟实时更新
+    const interval = setInterval(fetchNews, 30000);
+    return () => clearInterval(interval);
+  }, [topicId]);
+  
+  if (loading) return <LoadingSpinner />;
+  
+  return (
+    <div className="space-y-4">
+      {news.map(item => (
+        <div key={item.id} className="border-l-4 border-blue-500 pl-4 py-2">
+          <div className="flex justify-between text-sm text-gray-500">
+            <span>{item.source}</span>
+            <span>{new Date(item.date).toLocaleString()}</span>
+          </div>
+          <h4 className="font-medium mt-1">{item.title}</h4>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            {item.summary}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {item.topics.map(topic => (
+              <span key={topic} className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                #{topic}
+              </span>
+            ))}
+          </div>
+          {item.impact && (
+            <div className="mt-2 text-xs flex gap-3">
+              {Object.entries(item.impact).map(([key, value]) => (
+                <span key={key}>
+                  {key}: <span className={value.startsWith('+') ? 'text-green-600' : 'text-red-600'}>
+                    {value}
+                  </span>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+✅ 第五部分：评分标准对应
+评分维度	得分点	实现方式
+创新性 (20%)	新增功能1-3：数据预警（事前风控）、交互式教学（商业模式创新）、实时新闻（时效性）	预警算法、教学互动设计、多源新闻聚合
+技术 (20%)	完整API设计 + 外部API集成 + 实时更新机制	FastAPI + httpx + 模拟WebSocket
+用户体验 (20%)	预警弹窗、交互式图表、教学反馈	React组件 + 实时反馈
+可行性 (20%)	使用免费/低成本API + JSON文件存储	采用有免费层的API ，降低实现门槛
+市场潜力 (20%)	B端工具 + C端付费会员模式	基础功能免费，高级教学付费
+📝 第六部分：实现要求总结
+必须包含的功能模块
+原有核心功能（主题追踪、热度识别、关联发现、机构记忆、风险推演）
+
+数据发布前预警（经济日历集成+搜索时检查）
+
+技术分析学习平台（交互式图表+教学反馈+会员分层）
+
+实时新闻更新（2025-2026年数据+模拟实时推送）
+
+数据要求
+新闻数据：至少500条，覆盖2025年1月-2026年3月
+
+经济日历：至少100个重要事件，包含2026年数据
+
+行情数据：至少5个主流交易品种，含2026年K线
+
+实时更新模拟：每30秒新增一条新闻
+
+技术栈建议
+前端：React/Next.js + Lightweight Charts + Tailwind CSS
+
+后端：FastAPI + httpx (外部API调用)
+
+数据源：免费金融API  + 预置JSON文件
+
+部署：Docker容器化
+
