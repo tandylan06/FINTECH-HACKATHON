@@ -1,11 +1,18 @@
 ## MakanSense (team: makan 3.0)
 
 ## Project Description
-MakanSense is a macro intelligence software that reinvents the approach that asset managers use to overcome information overload. Our system is not just any system that misses the capabilities of a traditional key board alert and a piecemeal method of monitoring; but is an intelligent system, one that thinks, then recalls and then projects.
+MakanSense is an AI-powered macro intelligence dashboard built for asset managers facing information overload. Instead of manual keyword alerts and fragmented monitoring, MakanSense thinks, recalls, and predicts.
 
-Dual-dimension heat Index is use to differentiate between the hottest and the fastest-warming topics so users can divide their focus between the market and where opportunities are emerging. A top-ticker news alert bar that is highlighted in red letters and star ratings to ensure that the users never miss important 5 star events.
+Tracks topic evolution — A 12-week Live Theme Trajectory chart shows how macro themes develop over time, anchored to real-time heat scores from live news feeds.
 
-We also provide interactive learning charts, as their hovering over any indicator brings instant technical explanation and an Institutional Memory module that stores historical cases that would automatically be brought to the fore once similar patterns emerged. The most innovative one is the Risk Engine.It does not report upon events, but it preempts what will happen next (e.g., inflation surprise causes rate hike probability -> leads to rates volatility). MakanSense will simplify fragmented information by enabling asset managers to transition to proactive anticipation through an intuitive dashboard that links all insights to original articles.
+Identifies hot vs cooling themes — Our dual-dimension Heat Index separates the hottest themes from the fastest-warming, so asset managers know where to focus now versus where opportunity is emerging.
+
+Connects across regions and asset classes — The Global Correlation Engine links macro themes across geographies, surfacing hidden relationships between market-moving events.
+
+Institutional memory — Stores historical cases and automatically surfaces them when similar patterns re-emerge, so no precedent is lost.
+Intuitive dashboard — Every insight links directly to source articles. A live news ticker with star-rated economic events ensures nothing critical is missed.
+
+Risk implications — The Risk Engine preempts consequences rather than reporting events. Example: inflation surprise → rate hike probability → rates volatility ↑, giving asset managers a proactive edge.
 
 ## Features
 - Live macro theme tracking with heat index scoring
